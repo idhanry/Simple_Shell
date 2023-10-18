@@ -1,69 +1,73 @@
-#include "shell.h"
+#include "main.h"
 
 /**
- * prompt - The shell prompt prints
- * Return: The number of written bytes, or -1 on failure.
+ * * free_data - The data structure frees
+ * *
+ * * @datash: The structure data
+ * * Return: no return
  */
-ssize_t prompt(void)
+void free_data(data_shell *datash)
 {
-	return (write(STDOUT_FILENO, "#cisfun$ ", 9));
+	unsigned int i;
+
+	for (i = 0; datash->_environ[i]; i++)
+	{
+		free(datash->_environ[i]);
+	}
+
+	free(datash->_environ);
+	free(datash->pid);
 }
 
 /**
- * handle_eof - The EOF (Ctrl+D) scenario.
- * @line: The buffer line input.
+ * * set_data -The structure data initialized
+ * *
+ * * @datash: The structure data
+ * * @av: The vector argument
+ * * Return: no return
  */
-void handle_eof(char *line)
+void set_data(data_shell *datash, char **av)
 {
-	ssize_t bytes_written;
+	unsigned int i;
 
-	bytes_written = write(STDOUT_FILENO, "\n", 1);
-	if (bytes_written == -1)
+	datash->av = av;
+	datash->input = NULL;
+	datash->args = NULL;
+	datash->status = 0;
+	datash->counter = 1;
+
+	for (i = 0; environ[i]; i++)
+		;
+
+	datash->_environ = malloc(sizeof(char *) * (i + 1));
+
+	for (i = 0; environ[i]; i++)
 	{
-		perror("Error writing to standard output");
-		free(line);
-		exit(EXIT_FAILURE);
+		datash->_environ[i] = _strdup(environ[i]);
 	}
-	free(line);
-	exit(EXIT_SUCCESS);
+
+	datash->_environ[i] = NULL;
+	datash->pid = aux_itoa(getpid());
 }
 
 /**
- * main - The simple shell point of entry.
- * @argc: The number of Argument count.
- * @argv: The arguments of array.
- * Return: Always 0 (success).
+ * * main - The point entry
+ * *
+ * * @ac: The count argument
+ * * @av: The vector argument
+ * *
+ * * Return: 0 on success.
  */
-int main(int argc, char **argv)
+int main(int ac, char **av)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
+	data_shell datash;
+	(void) ac;
 
-	(void) argc;
-	(void) argv;
-
-	while (1)
-	{
-		if (prompt() == -1)
-		{
-			perror("Error writing to standard output");
-			exit(EXIT_FAILURE);
-		}
-
-		read = getline(&line, &len, stdin);
-
-		/* Check for End of File (EOF) or Ctrl+D */
-		if (read == -1)
-			handle_eof(line);
-
-		/* Command (line length greater than 1), execute it */
-		if (strlen(line) > 1)
-		{
-			line[read - 1] = '\0';  /* remove newline character */
-			execute_command(line);
-		}
-	}
-	free(line);
-	return (0);
+	signal(SIGINT, get_sigint);
+	set_data(&datash, av);
+	shell_loop(&datash);
+	free_data(&datash);
+	if (datash.status < 0)
+		return (255);
+	return (datash.status);
 }

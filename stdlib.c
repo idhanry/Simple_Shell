@@ -1,100 +1,112 @@
-#include "main.h"
+nclude "main.h"
 
 /**
- * * get_len - The get number lenght.
- * * @n: The int number type.
- * * Return: The number of length.
+ * * add_sep_node_end - A separator found at the end adds
+ * * of a sep_list.
+ * * @head: The linked list head.
+ * * @sep: found separator (; | &).
+ * * Return: address of the head.
  */
-int get_len(int n)
+sep_list *add_sep_node_end(sep_list **head, char sep)
 {
-	unsigned int n1;
-	int lenght = 1;
+	sep_list *new, *temp;
 
-	if (n < 0)
-	{
-		lenght++;
-		n1 = n * -1;
-	}
-	else
-	{
-		n1 = n;
-	}
-	while (n1 > 9)
-	{
-		lenght++;
-		n1 = n1 / 10;
-	}
-
-	return (lenght);
-}
-/**
- * * aux_itoa - The int function converts to string.
- * * @n: The type int number
- * * Return: String.
- */
-char *aux_itoa(int n)
-{
-	unsigned int n1;
-	int lenght = get_len(n);
-	char *buffer;
-
-	buffer = malloc(sizeof(char) * (lenght + 1));
-	if (buffer == 0)
+	new = malloc(sizeof(sep_list));
+	if (new == NULL)
 		return (NULL);
 
-	*(buffer + lenght) = '\0';
+	new->separator = sep;
+	new->next = NULL;
+	temp = *head;
 
-	if (n < 0)
+	if (temp == NULL)
 	{
-		n1 = n * -1;
-		buffer[0] = '-';
+		*head = new;
 	}
 	else
 	{
-		n1 = n;
+		while (temp->next != NULL)
+			temp = temp->next;
+		temp->next = new;
 	}
 
-	lenght--;
-	do {
-		*(buffer + lenght) = (n1 % 10) + '0';
-		n1 = n1 / 10;
-		lenght--;
-	}
-	while (n1 > 0)
-		;
-	return (buffer);
+	return (*head);
 }
 
 /**
- * * _atoi - A string converts to an integer.
- * * @s: The input string.
- * * Return: integer.
+ * * free_sep_list - The sep_list frees
+ * * @head: The linked list head.
+ * * Return: no return.
  */
-int _atoi(char *s)
+void free_sep_list(sep_list **head)
 {
-	unsigned int count = 0, size = 0, oi = 0, pn = 1, m = 1, i;
+	sep_list *temp;
+	sep_list *curr;
 
-	while (*(s + count) != '\0')
+	if (head != NULL)
 	{
-		if (size > 0 && (*(s + count) < '0' || *(s + count) > '9'))
-			break;
-
-		if (*(s + count) == '-')
-			pn *= -1;
-
-			if ((*(s + count) >= '0') && (*(s + count) <= '9'))
+		curr = *head;
+		while ((temp = curr) != NULL)
 		{
-				if (size > 0)
-					m *= 10;
-			size++;
+			curr = curr->next;
+			free(temp);
 		}
-		count++;
+		*head = NULL;
+	}
+}
+
+/**
+ * * add_line_node_end - A command line at adds at the end
+ * * of a line_list.
+ * * @head: The linked list head .
+ * * @line: The command line.
+ * * Return: The head of the address.
+ */
+line_list *add_line_node_end(line_list **head, char *line)
+{
+	line_list *new, *temp;
+
+	new = malloc(sizeof(line_list));
+	if (new == NULL)
+		return (NULL);
+
+	new->line = line;
+	new->next = NULL;
+	temp = *head;
+
+	if (temp == NULL)
+	{
+		*head = new;
+	}
+	else
+	{
+		while (temp->next != NULL)
+			temp = temp->next;
+		temp->next = new;
 	}
 
-		for (i = count - size; i < count; i++)
-	{
-		oi = oi + ((*(s + i) - 48) * m);
-		m /= 10;
-	}
-	return (oi * pn);
+	return (*head);
 }
+
+/**
+ * * free_line_list - The line_list frees
+ * * @head: The linked list head.
+ * * Return: no return.
+ */
+void free_line_list(line_list **head)
+{
+	line_list *temp;
+	line_list *curr;
+
+	if (head != NULL)
+	{
+		curr = *head;
+		while ((temp = curr) != NULL)
+		{
+			curr = curr->next;
+			free(temp);
+		}
+		*head = NULL;
+	}
+}
+

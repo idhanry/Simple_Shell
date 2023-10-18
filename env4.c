@@ -1,129 +1,69 @@
 #include "main.h"
 
 /**
- * * copy_info - The  info copies to create
- * * a new env or alias
- * * @name: The name (alias or env)
- * * @value: The value (alias or env)
- * *
- * * Return: The new alias or env.
+ * * env_error - The message error for env in get_env.
+ * * @datash: The relevant data (arguments, counter)
+ * * Return: The message error.
  */
-char *copy_info(char *name, char *value)
+char *error_env(data_shell *datash)
 {
-	char *new;
-	int len_name, len_value, len;
+	int length;
+	char *error;
+	char *ver_str;
+	char *msg;
 
-	len_name = _strlen(name);
-	len_value = _strlen(value);
-	len = len_name + len_value + 2;
-	new = malloc(sizeof(char) * (len));
-	_strcpy(new, name);
-	_strcat(new, "=");
-	_strcat(new, value);
-	_strcat(new, "\0");
+	ver_str = aux_itoa(datash->counter);
+	msg = ": Unable to add/remove from environment\n";
+	length = _strlen(datash->av[0]) + _strlen(ver_str);
+	length += _strlen(datash->args[0]) + _strlen(msg) + 4;
+	error = malloc(sizeof(char) * (length + 1));
+		if (error == 0)
+	{
+			free(error);
+				free(ver_str);
+					return (NULL);
+	}
 
-	return (new);
+	_strcpy(error, datash->av[0]);
+	_strcat(error, ": ");
+	_strcat(error, ver_str);
+	_strcat(error, ": ");
+	_strcat(error, datash->args[0]);
+	_strcat(error, msg);
+	_strcat(error, "\0");
+	free(ver_str);
+
+	return (error);
 }
-
 /**
- * * set_env - The variable environment
+ * * error_path_126 - The message error for path and denied failure permission.
+ * * @datash: The relevant data (arguments, counter).
  * *
- * * @name: The name of the variable environment
- * * @value: The value of the environment variable
- * * @datash: The structure data (environ)
- * * Return: no return
+ * * Return: The string error.
  */
-void set_env(char *name, char *value, data_shell *datash)
+char *error_path_126(data_shell *datash)
 {
-	int i;
-	char *var_env, *name_env;
+	int length;
+	char *ver_str;
+	char *error;
 
-	for (i = 0; datash->_environ[i]; i++)
+	ver_str = aux_itoa(datash->counter);
+	length = _strlen(datash->av[0]) + _strlen(ver_str);
+	length += _strlen(datash->args[0]) + 24;
+	error = malloc(sizeof(char) * (length + 1));
+		if (error == 0)
 	{
-		var_env = _strdup(datash->_environ[i]);
-		name_env = _strtok(var_env, "=");
-		if (_strcmp(name_env, name) == 0)
-		{
-			free(datash->_environ[i]);
-			datash->_environ[i] = copy_info(name_env, value);
-			free(var_env);
-			return;
-		}
-		free(var_env);
+			free(error);
+				free(ver_str);
+					return (NULL);
 	}
-
-	datash->_environ = _reallocdp(datash->_environ, i, sizeof(char *) * (i + 2));
-	datash->_environ[i] = copy_info(name, value);
-	datash->_environ[i + 1] = NULL;
-}
-
-/**
- * * _setenv - The env variables names
- * * with the name passed.
- * * @datash: The relevant data (env value and env name)
- * *
- * * Return: 1 on success.
- */
-int _setenv(data_shell *datash)
-{
-
-	if (datash->args[1] == NULL || datash->args[2] == NULL)
-	{
-		get_error(datash, -1);
-		return (1);
-	}
-
-	set_env(datash->args[1], datash->args[2], datash);
-
-	return (1);
-}
-
-/**
- * * _unsetenv - deletes a environment variable
- * *
- * * @datash: The relevant data (env name)
- * *
- * * Return: 1 on success.
- */
-int _unsetenv(data_shell *datash)
-{
-	char **realloc_environ;
-	char *var_env, *name_env;
-	int i, j, k;
-
-	if (datash->args[1] == NULL)
-	{
-		get_error(datash, -1);
-		return (1);
-	}
-	k = -1;
-	for (i = 0; datash->_environ[i]; i++)
-	{
-		var_env = _strdup(datash->_environ[i]);
-		name_env = _strtok(var_env, "=");
-		if (_strcmp(name_env, datash->args[1]) == 0)
-		{
-			k = i;
-		}
-		free(var_env);
-	}
-	if (k == -1)
-	{
-		get_error(datash, -1);
-		return (1);
-	}
-	realloc_environ = malloc(sizeof(char *) * (i));
-	for (i = j = 0; datash->_environ[i]; i++)
-	{
-		if (i != k)
-		{
-			realloc_environ[j] = datash->_environ[i];
-			j++;
-		}
-	}
-	realloc_environ[j] = NULL;
-	free(datash->_environ[k]);
-	free(datash->_environ);
-	datash->_environ = realloc_environ;
-	return (1);
+	_strcpy(error, datash->av[0]);
+	_strcat(error, ": ");
+	_strcat(error, ver_str);
+	_strcat(error, ": ");
+	_strcat(error, datash->args[0]);
+	_strcat(error, ": Permission denied\n");
+	_strcat(error, "\0");
+	free(ver_str);
+	return (error);
 }

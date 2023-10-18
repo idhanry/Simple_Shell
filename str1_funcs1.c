@@ -1,52 +1,61 @@
-#include "shell.h"
+#include "main.h"
 
 /**
-* _strcat - The two strings concatenates
-* @dest: The pointer to string destination.
-* @src: The pointer to string source.
-*
-* * Return: The pointer to string destination.
-*/
-
-char *_strcat(char *dest, const char *src)
+ * add_rvar_node - variable at the end adds
+ * of a r_var list.
+ * @head: The linked list head.
+ * @lvar: The length of the variable.
+ * @val:  The variable variable.
+ * @lval: The value of the length.
+ * Return: The head address.
+ */
+r_var *add_rvar_node(r_var **head, int lvar, char *val, int lval)
 {
-	char *destTemp = dest;
-	const char *srcTemp = src;
-		while (*destTemp != '\0')
+	r_var *new, *temp;
 
+	new = malloc(sizeof(r_var));
+	if (new == NULL)
+		return (NULL);
+
+	new->len_var = lvar;
+	new->val = val;
+	new->len_val = lval;
+
+	new->next = NULL;
+	temp = *head;
+
+	if (temp == NULL)
 	{
-			destTemp++;
+		*head = new;
+	}
+	else
+	{
+		while (temp->next != NULL)
+			temp = temp->next;
+		temp->next = new;
 	}
 
-		while (*srcTemp != '\0')
-	{
-			*destTemp++ = *srcTemp++;
-	}
-	*destTemp = '\0';
-
-	return (dest);
+	return (*head);
 }
 
 /**
- * * _strncat - Two strings concatenates where n number
- * * of bytes are copied from the source.
- * * @dest: The pointer to string destination.
- * * @src: The pointer to string source.
- * * @n: The src number of bytes to copy from..
- * *
- * * Return: Pointer to destination string.
+ * free_rvar_list - The r_var list frees
+ * @head: The linked list head.
+ * Return: no return.
  */
-char *_strncat(char *dest, const char *src, size_t n)
+void free_rvar_list(r_var **head)
 {
-	size_t dest_len = _strlen(dest);
-	size_t i;
+	r_var *temp;
+	r_var *curr;
 
-		for (i = 0; i < n && src[i] != '\0'; i++)
+	if (head != NULL)
 	{
-			dest[dest_len + i] = src[i];
+		curr = *head;
+		while ((temp = curr) != NULL)
+		{
+			curr = curr->next;
+			free(temp);
+		}
+		*head = NULL;
 	}
-	dest[dest_len + i] = '\0';
-
-	return (dest);
-i}
-
+}

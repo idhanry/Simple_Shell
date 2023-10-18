@@ -1,75 +1,144 @@
-#include "main.h":
+#include "main.h"
 
 /**
- * * cmp_env_name - Compares environment variable names with the passed name.
+ * * strcat_cd - The function that cd error message concatenates
  * *
- * * @nenv: The name of the environment variable
- * * @name: The name to compare with
- * *
- * * Return: 0 if names are not equal, otherwise,
- * a value indicating the position.
+ * * @datash: The relevant data
+ * * @msg: The print message
+ * * @error:The message output
+ * * @ver_str: The lines counter
+ * * Return: The message error
  */
-int cmp_env_name(const char *nenv, const char *name)
+char *strcat_cd(data_shell *datash, char *msg, char *error, char *ver_str)
 {
-	int i;
+	char *illegal_flag;
 
-	for (i = 0; nenv[i] != '='; i++)
+	_strcpy(error, datash->av[0]);
+	_strcat(error, ": ");
+	_strcat(error, ver_str);
+	_strcat(error, ": ");
+	_strcat(error, datash->args[0]);
+	_strcat(error, msg);
+		if (datash->args[1][0] == '-')
 	{
-		if (nenv[i] != name[i])
-		{
-
-			return (0);
-		}
+			illegal_flag = malloc(3);
+				illegal_flag[0] = '-';
+					illegal_flag[1] = datash->args[1][1];
+						illegal_flag[2] = '\0';
+							_strcat(error, illegal_flag);
+								free(illegal_flag);
+	}
+	else
+	{
+			_strcat(error, datash->args[1]);
 	}
 
-	return (i + 1);
+	_strcat(error, "\n");
+	_strcat(error, "\0");
+	return (error);
 }
 
 /**
- * * _getenv - Gets an environment variable by name.
- * *
- * * @name: The name of the environment variable to retrieve
- * * @_environ: The environment variables array
- * *
- * * Return: The value of the environment variable if found, NULL otherwise.
+ * * error_get_cd - The message error for cd command in get_cd
+ * * @datash: The relevant data (directory)
+ * * Return: The message error
  */
-char *_getenv(const char *name, char **_environ)
+char *error_get_cd(data_shell *datash)
 {
-	char *ptr_env = NULL;
-	int i, mov;
+	int length, len_id;
+	char *error, *ver_str, *msg;
 
-	for (i = 0; _environ[i]; i++)
+	ver_str = aux_itoa(datash->counter);
+		if (datash->args[1][0] == '-')
 	{
-		mov = cmp_env_name(_environ[i], name);
-		if (mov)
-		{
-			ptr_env = _environ[i];
-			break;
-		}
+			msg = ": Illegal option ";
+				len_id = 2;
+	}
+	else
+	{
+			msg = ": can't cd to ";
+				len_id = _strlen(datash->args[1]);
 	}
 
-	return (ptr_env + mov);
+	length = _strlen(datash->av[0]) + _strlen(datash->args[0]);
+	length += _strlen(ver_str) + _strlen(msg) + len_id + 5;
+	error = malloc(sizeof(char) * (length + 1));
+
+		if (error == 0)
+	{
+			free(ver_str);
+				return (NULL);
+	}
+
+	error = strcat_cd(datash, msg, error, ver_str);
+
+	free(ver_str);
+
+	return (error);
 }
 
 /**
- * * _env - Prints the environment variables.
- * *
- * * @datash: Relevant data structure
- * * @return: 1 on success, 0 on failure
+ * * error_not_found - The error generic message for command not found
+ * * @datash: The relevant data (arguments, counter)
+ * * Return: The message error
  */
-int _env(data_shell *datash)
+char *error_not_found(data_shell *datash)
 {
-	int i, k;
+	int length;
+	char *error;
+	char *ver_str;
 
-	for (i = 0; datash->_environ[i]; i++)
+	ver_str = aux_itoa(datash->counter);
+	length = _strlen(datash->av[0]) + _strlen(ver_str);
+	length += _strlen(datash->args[0]) + 16;
+	error = malloc(sizeof(char) * (length + 1));
+		if (error == 0)
 	{
-		for (k = 0; datash->_environ[i][k]; k++)
-			;
-		write(STDOUT_FILENO, datash->_environ[i], k);
-		write(STDOUT_FILENO, "\n", 1);
+			free(error);
+				free(ver_str);
+					return (NULL);
 	}
-
-	datash->status = 0;
-	return (1);
+	_strcpy(error, datash->av[0]);
+	_strcat(error, ": ");
+	_strcat(error, ver_str);
+	_strcat(error, ": ");
+	_strcat(error, datash->args[0]);
+	_strcat(error, ": not found\n");
+	_strcat(error, "\0");
+	free(ver_str);
+	return (error);
 }
 
+/**
+ * * The_error_exit_shell - The generic error message in get_exit
+ * * @datash: The relevant data (arguments, arguments)
+ * *
+ * * Return: The error message
+ */
+char *error_exit_shell(data_shell *datash)
+{
+	int length;
+	char *error;
+	char *ver_str;
+
+	ver_str = aux_itoa(datash->counter);
+	length = _strlen(datash->av[0]) + _strlen(ver_str);
+	length += _strlen(datash->args[0]) + _strlen(datash->args[1]) + 23;
+	error = malloc(sizeof(char) * (length + 1));
+		if (error == 0)
+	{
+			free(ver_str);
+				return (NULL);
+	}
+	_strcpy(error, datash->av[0]);
+	_strcat(error, ": ");
+	_strcat(error, ver_str);
+	_strcat(error, ": ");
+	_strcat(error, datash->args[0]);
+	_strcat(error, ": Illegal number: ");
+	_strcat(error, datash->args[1]);
+	_strcat(error, "\n\0");
+	free(ver_str);
+
+	return (error);
+}

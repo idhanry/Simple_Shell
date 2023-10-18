@@ -1,40 +1,80 @@
-#include "main.h"
+nclude "main.h"
 
 /**
- * * hand_one - one information for the builtin one.
+ * * aux_help_env - The builtin env help information
  * * Return: no return
  */
-void hand_one(void)
+void aux_help_env(void)
 {
-	char *one = "one: one [-dms] [pattern ...]\n";
+	char *help = "env: env [option] [name=value] [command [args]]\n\t";
 
-	write(STDOUT_FILENO, one, _strlen(one));
-	one = "\tDisplay information about builtin commands.\n ";
-	write(STDOUT_FILENO, one, _strlen(one));
-	one = "Displays brief summaries of builtin commands.\n";
-	write(STDOUT_FILENO, one, _strlen(one));
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "Print the enviroment of the shell.\n";
+	write(STDOUT_FILENO, help, _strlen(help));
+
 }
 /**
- * * hand_one_alias - one information for the alias builtin.
+ * * aux_help_setenv - The builtin setenv help information
  * * Return: no return
  */
-void hand_one_alias(void)
+void aux_help_setenv(void)
 {
-	char *one = "alias: alias [-p] [name[=value]...]\n";
 
-	write(STDOUT_FILENO, one, _strlen(one));
-	one = "\tDefine or display aliases.\n ";
-	write(STDOUT_FILENO, one, _strlen(one));
+	char *help = "setenv: setenv (const char *name, const char *value,";
+
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "int replace)\n\t";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "Add a new definition to the environment\n";
+	write(STDOUT_FILENO, help, _strlen(help));
 }
 /**
- * * hand_one_cd - one information for the alias builtin.
+ * * aux_help_unsetenv - The builtin unsetenv help information
  * * Return: no return
  */
-void hand_one_cd(void)
+void aux_help_unsetenv(void)
 {
-	char *one = "cd: cd [-L|[-P [-e]] [-@]] [dir]\n";
+	char *help = "unsetenv: unsetenv (const char *name)\n\t";
 
-	write(STDOUT_FILENO, one, _strlen(one));
-	one = "\tChange the shell working directory.\n ";
-	write(STDOUT_FILENO, one, _strlen(one));
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "Remove an entry completely from the environment\n";
+	write(STDOUT_FILENO, help, _strlen(help));
+}
+
+
+/**
+ * * aux_help_general - The Entry point for builtin help information
+ * * Return: no return
+ */
+void aux_help_general(void)
+{
+	char *help = "^-^ bash, version 1.0(1)-release\n";
+
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "These commands are defined internally.Type 'help' to see the list";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "Type 'help name' to find out more about the function 'name'.\n\n ";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = " alias: alias [name=['string']]\n cd: cd [-L|[-P [-e]] [-@]] ";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "[dir]\nexit: exit [n]\n  env: env [option] [name=value] [command ";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "[args]]\n  setenv: setenv [variable] [value]\n  unsetenv: ";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "unsetenv [variable]\n";
+	write(STDOUT_FILENO, help, _strlen(help));
+}
+/**
+ * * aux_help_exit - The builtin exit help information
+ * * Return: no return
+ */
+void aux_help_exit(void)
+{
+	char *help = "exit: exit [n]\n Exit shell.\n";
+
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "Exits the shell with a status of N. If N is ommited, the exit";
+	write(STDOUT_FILENO, help, _strlen(help));
+	help = "statusis that of the last command executed\n";
+	write(STDOUT_FILENO, help, _strlen(help));
 }
