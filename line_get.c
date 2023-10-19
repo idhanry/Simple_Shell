@@ -1,84 +1,66 @@
-#include "main.h"
+#include "shell.h"
 
 /**
- * bring_line - assigns the line for get_line var
- * @lineptr: The Buffer that the input str stores
- * @buffer: The str that is been called to line
- * @n: line size
- * @j: The buffer size
- */
-void bring_line(char **lineptr, size_t *n, char *buffer, size_t j)
+* _getline  The Input By User From Stdin read
+*
+* Return: The Input
+*/
+char *_getline(void)
 {
+	int i = 0;
+	ssize_t nread;
+	char c = 0, *buffer = malloc(sizeof(char) * BUFFER_SIZE);
 
-	if (*lineptr == NULL)
+	if (buffer == NULL)
 	{
-		if  (j > BUFSIZE)
-			*n = j;
-
-		else
-			*n = BUFSIZE;
-		*lineptr = buffer;
+		return (NULL);
 	}
-	else if (*n < j)
+	while (c != EOF && c != '\n')
 	{
-		if (j > BUFSIZE)
-			*n = j;
-		else
-			*n = BUFSIZE;
-		*lineptr = buffer;
-	}
-	else
-	{
-		_strcpy(*lineptr, buffer);
-		free(buffer);
-	}
-}
-/**
- * get_line - Read inpt from stream
- * @lineptr: buffer that stores the input
- * @n: size of lineptr
- * @stream: stream to read from
- * Return: The number of bytes
- */
-ssize_t get_line(char **lineptr, size_t *n, FILE *stream)
-{
-	int i;
-	static ssize_t input;
-	ssize_t retval;
-	char *buffer;
-	char t = 'z';
-
-	if (input == 0)
-		fflush(stream);
-	else
-		return (-1);
-	input = 0;
-
-	buffer = malloc(sizeof(char) * BUFSIZE);
-	if (buffer == 0)
-		return (-1);
-	while (t != '\n')
-	{
-		i = read(STDIN_FILENO, &t, 1);
-		if (i == -1 || (i == 0 && input == 0))
+		nread = read(STDIN_FILENO, &c, 1);
+		if (nread == 0 || nread == -1)
 		{
 			free(buffer);
-			return (-1);
+			if (nread == 0)
+				exit(ex_code);
+			if (nread == -1)
+				perror("Error: ");
 		}
-		if (i == 0 && input != 0)
+		buffer[i] = c;
+		if (buffer[0] == '\n')
 		{
-			input++;
-			break;
+			free(buffer);
+			return ("\0");
 		}
-		if (input >= BUFSIZE)
-			buffer = _realloc(buffer, input, input + 1);
-		buffer[input] = t;
-		input++;
+		if (i + 1 >= BUFFER_SIZE)
+		{
+			buffer = _realloc(buffer, i + 1);
+			if (buffer == NULL)
+			{
+				free(buffer);
+				return (NULL);
+			}
+		}
+		i++;
 	}
-	buffer[input] = '\0';
-	bring_line(lineptr, n, buffer, input);
-	retval = input;
-	if (i != 0)
-		input = 0;
-	return (retval);
+	buffer[i - 1] = '\0';
+	remwspaces(buffer);
+	hash_handler(buffer);
+	return (buffer);
+}
+
+/**
+* hash_handler - The hash character in input handle
+* @buff: The input buffer
+*/
+void hash_handler(char *buff)
+{
+	int i = 0;
+
+	while (buff[i] != '\0')
+	{
+		if (buff[i] == '#')
+			buff[i] = '\0';
+		i++;
+	}
 }
