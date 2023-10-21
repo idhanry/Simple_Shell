@@ -59,7 +59,7 @@ void tokenize(char *command, char *argv[MAX_ARGS])
 * num_args - The number of arguments in an array count
 * @argv: array of arguments
 *
-* Return: The number of argv arguments 
+* Return: The number of argv arguments
 */
 int num_args(char *argv[])
 {
